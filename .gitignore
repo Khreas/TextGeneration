@@ -9,3 +9,6 @@ gutenberg/
 
 # Python compiled code
 *.pyc
+
+# Txt file in data
+data/**/*.txt
