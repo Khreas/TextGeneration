@@ -5,16 +5,26 @@ import io
 import time
 import logging
 import re
+import zipfile
+import sys
 
 from os import listdir, remove
-from os.path import isfile, join
+from os.path import isfile, join, isdir
 from findtext import findAllIncorrectTexts
 
-logging.basicConfig(filename='logs/cleanText.log',level=logging.DEBUG)
+logging.basicConfig(filename='logs/inputGeneration.log',level=logging.DEBUG, format='%(asctime)s %(message)s',  datefmt='%d/%m/%Y %I:%M:%S %p')
 
 def concatenateFiles(inputDirectory, outputFile):
 	
 	logging.info("Concatenation : started")
+
+	if not isdir('gutenberg'):
+		if isfile('gutenberg.zip'):
+			print 'Extracting files ...'
+			zipfile.ZipFile("gutenberg.zip", "r").extractall()
+		else:
+			print 'No files available. Program will now exit.'
+			sys.exit()
 
 	file_list = [join(inputDirectory, f) for f in listdir(inputDirectory) if isfile(join(inputDirectory, f))]
 
@@ -36,7 +46,7 @@ def concatenateFiles(inputDirectory, outputFile):
 def cleanText(inputFile, outputFile):
 
 	logging.info("Cleaning : started at %s" % (time.time() - start))
-
+	print 'Cleaning started'
 	last_char = ''
 
 	opening_header = [u'Project Gutenberg', u'Project gutenberg', u'project gutenberg']
@@ -134,8 +144,15 @@ def cleanText(inputFile, outputFile):
 			if skip_line > 0:
 				skip_line -= 1
 
+	end_clean = time.time()
+	logging.info("Cleaning : done at %s" %(end_clean - start))
+	
+	logging.info("Zipping started")
 
-	logging.info("Cleaning : done at %s" %(time.time() - start))
+	with zipfile.ZipFile(outputFile[:-4] + ".zip", "w", zipfile.ZIP_DEFLATED) as fzip:
+		fzip.write(outputFile, arcname='input.txt')
+
+	logging.info("Zipping ended. Took %3f" %(time.time() - end_clean))
 
 if __name__ == '__main__':
 

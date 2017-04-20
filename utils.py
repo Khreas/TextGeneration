@@ -1,8 +1,11 @@
 import codecs
 import os
 import collections
-from six.moves import cPickle
+import sys
+import zipfile
 import numpy as np
+from six.moves import cPickle
+
 
 
 class TextLoader():
@@ -11,6 +14,14 @@ class TextLoader():
         self.batch_size = batch_size
         self.seq_length = seq_length
         self.encoding = encoding
+
+        if not os.path.exists(os.path.join(data_dir, "input.txt")):
+            if os.path.exists(os.path.join(data_dir, "input.zip")):
+                print 'Extracting files ...'
+                zipfile.ZipFile(os.path.join(data_dir, "input.zip"), "r").extractall(data_dir)
+            else:
+                print 'No input file found'
+                sys.exit()
 
         input_file = os.path.join(data_dir, "input.txt")
         vocab_file = os.path.join(data_dir, "vocab.pkl")

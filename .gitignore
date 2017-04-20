@@ -1,0 +1,11 @@
+# Log directory
+logs/
+
+# Save directory
+save/
+
+# Gutenberg directory
+gutenberg/
+
+# Python compiled code
+*.pyc
