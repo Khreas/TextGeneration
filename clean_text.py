@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import argparse
 import io
 import time
 import logging
@@ -14,7 +15,7 @@ from findtext import findAllIncorrectTexts
 
 logging.basicConfig(filename='logs/inputGeneration.log',level=logging.DEBUG, format='%(asctime)s %(message)s',  datefmt='%d/%m/%Y %I:%M:%S %p')
 
-def concatenateFiles(inputDirectory, outputFile):
+def concatenateFiles(inputDirectory, outputFile, args):
 	
 	logging.info("Concatenation : started")
 
@@ -33,17 +34,22 @@ def concatenateFiles(inputDirectory, outputFile):
 	logging.debug("	Number of incorrect texts found: %d" % len(rejected_files))
 	logging.info("	Finding incorrect Texts : done in %3f seconds" % (time.time() - start))
 
+	nb_files = 0
+
 	with io.open(outputFile, 'w', encoding='utf-8-sig') as output_file:
 		for file in file_list:
+			if nb_files > args.nb_files:
+				break
 			if file not in (filepath for filepath in rejected_files):
 				with io.open(file, 'r', encoding='utf-8-sig', errors='ignore') as input_file:
 					output_file.write(input_file.read())
+					nb_files += 1
 
 	logging.info("Last file processed : " + file_list[-1])
-
+	logging.info("Number of files loaded : %d" %nb_files)
 	logging.info("Concatenation : done in %s" %(time.time() - start))
 
-def cleanText(inputFile, outputFile):
+def cleanText(inputFile, outputFile, args):
 
 	logging.info("Cleaning : started at %s" % (time.time() - start))
 	print 'Cleaning started'
@@ -156,14 +162,21 @@ def cleanText(inputFile, outputFile):
 
 if __name__ == '__main__':
 
+	parser = argparse.ArgumentParser(
+                       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser.add_argument('--nb_files', type=int, default=100,
+						help='number of files to deal with')
+
+	args = parser.parse_args()
+
 	inpath = 'gutenberg'
 	outpath = 'data/french/input.txt'
 	tmpath = 'data/french/input_tmp.txt'
 
 	start = time.time()
 
-	concatenateFiles(inpath, tmpath)
-	cleanText(tmpath, outpath)
+	concatenateFiles(inpath, tmpath, args)
+	cleanText(tmpath, outpath, args)
 	remove("data/french/input_tmp.txt")
 
 	logging.info("Program ran in %s seconds" % (time.time() - start))

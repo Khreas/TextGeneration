@@ -12,3 +12,6 @@ gutenberg/
 
 # Txt file in data
 data/**/*.txt
+
+# Rapport stage
+*.rap
