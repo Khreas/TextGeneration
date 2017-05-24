@@ -19,10 +19,10 @@ def concatenateFiles(inputDirectory, outputFile, args):
 	
 	logging.info("Concatenation : started")
 
-	if not isdir('gutenberg'):
-		if isfile('gutenberg.zip'):
+	if not isdir(inputDirectory):
+		if isfile(join(inputDirectory, 'zip')):
 			print 'Extracting files ...'
-			zipfile.ZipFile("gutenberg.zip", "r").extractall()
+			zipfile.ZipFile(join(inputDirectory, 'zip'), "r").extractall()
 		else:
 			print 'No files available. Program will now exit.'
 			sys.exit()
@@ -164,19 +164,21 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(
                        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-	parser.add_argument('--nb_files', type=int, default=100,
-						help='number of files to deal with')
+	parser.add_argument('--nb_files', type=int, default=100, help='Number of files concatenated and cleaned by the cleaner')
+	parser.add_argument('--in_dir', type=str, default='gutenberg', help='Directory in which the files are stored')
+	parser.add_argument('--out_dir', type=str, default='data/french/input.txt', help='Directory in which the clean file will be stored')
+	parser.add_argument('--name', type=str, default='input', help='Name of the file written by the cleaner')
 
 	args = parser.parse_args()
 
-	inpath = 'gutenberg'
-	outpath = 'data/french/input.txt'
-	tmpath = 'data/french/input_tmp.txt'
+	inpath = args.in_dir
+	outpath = args.out_dir
+	tmpath = args.name + '_tmp.txt'
 
 	start = time.time()
 
 	concatenateFiles(inpath, tmpath, args)
 	cleanText(tmpath, outpath, args)
-	remove("data/french/input_tmp.txt")
+	remove(tmpath)
 
 	logging.info("Program ran in %s seconds" % (time.time() - start))

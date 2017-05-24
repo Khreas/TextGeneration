@@ -1,29 +1,34 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import io
 import sys
 import os
+import argparse
 from os import listdir, remove
 from os.path import isfile, join
 
-def getNameText(string):
+def getNameText(string, cmd):
 	
 	inputDirectory = 'gutenberg'
 
 	file_list = [join(inputDirectory, f) for f in listdir(inputDirectory) if isfile(join(inputDirectory, f))]
-
+	flag_found = False
 	nb_file = 0
-	cmd = 'subl '
+	cmd += ' '
 	for file in file_list:
 			with io.open(file, 'r', encoding='utf-8-sig') as input_file:
 				for line in input_file:
 					if string in line:
-						print file
-						os.system(cmd + file)
-						nb_file+=1
+						flag_found = True
 
-	print "Number of file(s) found : %d" % nb_file
+				if flag_found:
+					nb_file+=1		
+					print(file)
+					os.system(cmd + file)
+					flag_found = False
+
+	print("Number of file(s) found : " + str(nb_file))
 
 def findAllIncorrectTexts(inputDirectory):
 
@@ -52,4 +57,9 @@ def findAllIncorrectTexts(inputDirectory):
 
 if __name__ == '__main__':
 	
-	getNameText(str(sys.argv[1]))
+	parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser.add_argument('-s', type=str,default='',help='String to be found in the texts available in the directory "gutenberg".')
+	parser.add_argument('--editor', type=str, default='gedit', help='Command launching the text editor, e.g. "gedit" for Gedit or "subl" for Sublime Text.')	
+	args = parser.parse_args()
+
+	getNameText(args.s, args.editor)

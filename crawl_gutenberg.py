@@ -59,7 +59,6 @@ def crawler(args):
 
 		pattern = re.compile("^(//www.gutenberg.org/ebooks/)[0-9]+$")
 
-		print("Jean-Louis est beau")
 
 		for link in list_link:
 			response = requests.get(link)
@@ -68,12 +67,10 @@ def crawler(args):
 						if pattern.match(str(webpage.get('href'))):
 							list_book.append(webpage.get('href'))
 
-		print("Jean-Louis est grand")
 
 		for index, element in enumerate(list_book):
 			list_book[index] = element[2:]
 
-		print("Jean-Louis est magnifique")
 
 		nb_dl = 0
 
@@ -86,11 +83,12 @@ def crawler(args):
 					print("\neBook " + book + " successfully downloaded.\neBook (%d / %d)\n\n" %(nb_dl, args.nb_files))
 					nb_dl = nb_dl + 1
 				if nb_dl > args.nb_files:
-					print("Jean-Louis est ... Jean-Louis.")
 					return
 
 	elif args.crawl_type.lower() == 'styles':
 		
+
+
 		styles = ['Science_fiction', 'Théâtre', 'Nouvelles', 'Poésie', 'Séduction_et_libertinage']
 
 		for link in BeautifulSoup(response, "lxml", parse_only=SoupStrainer('a')).find_all('a'):
