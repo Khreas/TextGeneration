@@ -5,6 +5,7 @@ import io
 import sys
 import os
 import argparse
+import unicodedata
 from os import listdir, remove
 from os.path import isfile, join
 
@@ -19,6 +20,7 @@ def getNameText(string, cmd):
 	for file in file_list:
 			with io.open(file, 'r', encoding='utf-8-sig') as input_file:
 				for line in input_file:
+					line = ''.join((c for c in unicodedata.normalize('NFD', line) if unicodedata.category(c) != 'Mn'))
 					if string in line:
 						flag_found = True
 
